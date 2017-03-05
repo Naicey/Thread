@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <pthread.h>
+#include <unistd.h>
 
 int x = 0;
 pthread_t thread_ctl;
@@ -17,7 +18,7 @@ pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;
 
 //Asset x = 0;
 
-void CreateOneWorker()
+void * CreateOneWorker(void * arg)
 {
    while(x <= 20000)
    {
@@ -31,15 +32,15 @@ void CreateOneWorker()
 }
 
 
-void TriggerallStart()
+void * TriggerallStart(void * arg)
 {
   int ret = 0;
   
-  ret = pthread_create(&thread1, NULL, (void *)CreateOneWorker, NULL);
+  ret = pthread_create(&thread1, NULL, CreateOneWorker, NULL);
   if( ret !=0 )
      printf("can't create thread1");
     
-  ret = pthread_create(&thread2, NULL, (void *)CreateOneWorker, NULL);
+  ret = pthread_create(&thread2, NULL, CreateOneWorker, NULL);
   if( ret !=0 )
      printf("can't create thread2");
   
