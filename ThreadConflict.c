@@ -15,7 +15,7 @@ pthread_t thread2;
 pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;
 
 
-Asset x = 0;
+//Asset x = 0;
 
 void CreateOneWorker()
 {
