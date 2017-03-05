@@ -18,7 +18,7 @@ pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;
 
 //Asset x = 0;
 
-void * CreateOneWorker(void * arg)
+void * CreateOneWorker(void)
 {
    while(x <= 20000)
    {
@@ -32,7 +32,7 @@ void * CreateOneWorker(void * arg)
 }
 
 
-void * TriggerallStart(void * arg)
+void * TriggerallStart(void)
 {
   int ret = 0;
   
