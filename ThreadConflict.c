@@ -5,11 +5,6 @@
 
 #include <stdio.h>
 #include <pthread.h>
-#include <spinlock.h> 
-#include <sys/signal.h>
-
-#define  spin_lock(lock)       _spin_lock(lock)
-#define  spin_unlock(lock)     _spin_unlock(lock)
 
 int x = 0;
 pthread_t thread_ctl;
@@ -17,9 +12,8 @@ pthread_t thread1;
 pthread_t thread2;
 
 //declare a spinlock for global variable
-spinlock_t glb_var = SPIN_LOCK_UNLOCKED;
+pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;
 
-sigset_t set;
 
 Asset x = 0;
 
@@ -27,11 +21,11 @@ void CreateOneWorker()
 {
    while(x <= 20000)
    {
-     spin_lock(&glb_var);
+     pthread_mutex_lock(&mutex);
      
      x++;
      
-     spin_unlock(&glb_var);
+     pthread_mutex_unlock(&mutex);
      sleep(1);
    }  
 }
@@ -53,36 +47,11 @@ void TriggerallStart()
   pthread_join(thread2, NULL);
 }
 
-void WaitAllDone()
-{
-    int signum;
-    while(1)
-    {
-       if(SIGUSR1==signum)
-       {  
-          printf("x is 20000");
-          break;
-       }
-    }
-       
-}
-
-Assert x = 20000;
-
 
 int main(void)
 {
-  spinlock_t spin_lock_init(&glb_var);
-  
-  sigemptyset(&set);
-  sigaddset(&set,SIGUSR1);
-  sigprocmask(SIG_SETMASK, &set, NULL);
-  
   pthread_create(&thread_ctl,NULL,TriggerallStart,NULL);
   
-  WaitAllDone();
-  
-  pthread_kill(thread_ctl,SIGUSR1);
   pthread_join(thread_ctl,NULL);
   
   return 0;
