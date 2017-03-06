@@ -6,11 +6,10 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <assert.h>
+#include <unistd.h>
 
 int x = 0;
-pthread_t thread_ctl;
-pthread_t thread1;
-pthread_t thread2;
 
 //declare a spinlock for global variable
 pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;
@@ -18,42 +17,39 @@ pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;
 
 //Asset x = 0;
 
-void * CreateOneWorker(void)
+void * Producer(void*)
 {
-   while(x <= 20000)
+    int i = 0;
+   for(i =0; i<10000; i++)
    {
-     pthread_mutex_lock(&mutex);
-     
+    // pthread_mutex_lock(&mutex);
      x++;
-     
-     pthread_mutex_unlock(&mutex);
-     sleep(1);
+     //usleep(1000);
+     //pthread_mutex_unlock(&mutex);
    }  
 }
 
 
-void * TriggerallStart(void)
+void  TestMultiThread(void)
 {
   int ret = 0;
+  pthread_t thread1;
+  pthread_t thread2;
   
-  ret = pthread_create(&thread1, NULL, CreateOneWorker, NULL);
-  if( ret !=0 )
-     printf("can't create thread1");
-    
-  ret = pthread_create(&thread2, NULL, CreateOneWorker, NULL);
-  if( ret !=0 )
-     printf("can't create thread2");
+  ret = pthread_create(&thread1, NULL, Producer, NULL);
+  assert(ret == 0);
+  
+  ret = pthread_create(&thread2, NULL, Producer, NULL);
+  assert(ret == 0);
   
   pthread_join(thread1, NULL);
   pthread_join(thread2, NULL);
+  printf("x=%d\n", x);
 }
 
 
 int main(void)
 {
-  pthread_create(&thread_ctl,NULL,TriggerallStart,NULL);
-  
-  pthread_join(thread_ctl,NULL);
-  
+  TestMultiThread();
   return 0;
 }
